@@ -49,6 +49,7 @@ std::ostream& operator << (std::ostream& out, const big_int& val) {
 	return out;
 }
 
+
 bool big_int::operator == (const big_int& r) const
 {
 	if (minus != r.minus) return false;
@@ -58,4 +59,43 @@ bool big_int::operator == (const big_int& r) const
 		if (num[i] != r.num[i])
 			return false;
 	return true;
+}
+
+
+bool big_int::operator < (const big_int& r) const{
+	if (minus && !r.minus) return true;
+	if (r.minus && !minus) return false;
+	if (num.size() < r.num.size()) return (!minus);
+	if (num.size() > r.num.size()) return (minus);
+	for (auto i = num.size() - 1; i >= 0 && !num.empty(); --i) {
+		if (num[i] < r.num[i]) return (!minus);
+		if (num[i] > r.num[i]) return (minus);
+	}
+	return false;
+}
+
+bool operator != (const big_int& l, const big_int& r) {
+	return !(l == r);
+}
+
+bool operator <= (const big_int& l, const big_int& r) {
+	return (l < r || l == r);
+}
+
+bool operator > (const big_int& l, const big_int& r) {
+	return !(l <= r);
+}
+
+bool operator >= (const big_int& l, const big_int& r) {
+	return !(l < r);
+}
+
+big_int big_int::operator +() {
+	minus = false;
+	return *this;
+}
+
+big_int& big_int::operator -() {
+	if (num.size() != 0) minus = true;
+	return *this;
 }

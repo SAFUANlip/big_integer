@@ -28,8 +28,34 @@ public:
 	big_int(const char* c) : big_int(static_cast<std::string>(c)) {};
 
 	friend std::ostream& operator << (std::ostream&, const big_int&);
-	bool operator == (const big_int&) const;
-	//bool operator < (const)
 
+	bool operator == (const big_int&) const;
+	bool operator < (const big_int&) const;
+	
+	big_int operator +();
+	big_int& operator -();
+
+	/*auto operator <=>(const big_int& other, const big_int&) { // still dont know how to make it
+		return;
+	}*/
 };
 
+
+
+template<typename T>
+bool operator == (const T& l, const big_int& r) {
+	return (big_int(l) == r);
+}
+
+template<typename T>
+bool operator < (const T& l, const big_int& r) {
+	return (big_int(l) < r);
+}
+
+bool operator != (const big_int& l, const big_int& r);
+
+bool operator <= (const big_int& l, const big_int& r);
+
+bool operator > (const big_int& l, const big_int& r);
+
+bool operator >= (const big_int& l, const big_int& r);

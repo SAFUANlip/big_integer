@@ -16,6 +16,8 @@ private:
 	bool minus = false;
 	static const int base = 1000000000; // 1 000 000 000, limitation for int
 
+	void remove_leading_zeros();
+	
 public:
 	// don't make explicit for operator == working not only with big_int, big_int 
 	big_int() {};
@@ -32,9 +34,15 @@ public:
 	bool operator == (const big_int&) const;
 	bool operator < (const big_int&) const;
 	
-	big_int operator +();
-	big_int& operator -();
-
+	const big_int operator +() const;
+	const big_int operator -() const;
+	big_int& operator += (const big_int&);
+	big_int& operator -= (const big_int&);
+	big_int& operator ++();
+	const big_int operator ++(int);
+	big_int& operator --();
+	const big_int operator --(int);
+	big_int& operator *= (const big_int&);
 	/*auto operator <=>(const big_int& other, const big_int&) { // still dont know how to make it
 		return;
 	}*/
@@ -59,3 +67,7 @@ bool operator <= (const big_int& l, const big_int& r);
 bool operator > (const big_int& l, const big_int& r);
 
 bool operator >= (const big_int& l, const big_int& r);
+
+const big_int operator + (const big_int& l, const big_int& r);
+const big_int operator - (const big_int& l, const big_int& r);
+const big_int operator * (const big_int& l, const big_int& r);

@@ -36,6 +36,11 @@ big_int::big_int(unsigned long long ull) {
 	}
 }
 
+void big_int::remove_leading_zeros() {
+	while (num.size() > 0 && num.back() == 0)
+		num.pop_back();
+}
+
 std::ostream& operator << (std::ostream& out, const big_int& val) {
 	if (val.num.empty())
 		out << '0'; 
@@ -67,7 +72,7 @@ bool big_int::operator < (const big_int& r) const{
 	if (r.minus && !minus) return false;
 	if (num.size() < r.num.size()) return (!minus);
 	if (num.size() > r.num.size()) return (minus);
-	for (auto i = num.size() - 1; i >= 0 && !num.empty(); --i) {
+	for (long long i = num.size() - 1; i >= 0 && !num.empty(); --i) {
 		if (num[i] < r.num[i]) return (!minus);
 		if (num[i] > r.num[i]) return (minus);
 	}
@@ -90,12 +95,129 @@ bool operator >= (const big_int& l, const big_int& r) {
 	return !(l < r);
 }
 
-big_int big_int::operator +() {
-	minus = false;
+const big_int big_int::operator +() const{
+	return big_int(*this);
+}
+
+const big_int big_int::operator -() const{
+	if (num.size() != 0) {
+		big_int copy(*this);
+		copy.minus = !minus;
+		return copy;
+	}
 	return *this;
 }
 
-big_int& big_int::operator -() {
-	if (num.size() != 0) minus = true;
+big_int& big_int::operator += (const big_int& r){
+	if (minus) {
+		*this = -(*this);
+		if (r.minus) {
+			*this = -(*this += (-r));
+			return *this;
+		}
+		else {
+			big_int rr(r);
+			*this = rr -= *this;
+			return *this;
+		}
+	}
+	else if (r.minus)
+		return *this -=(-r);
+	short buff = 0;
+	for (auto i = 0; i < std::max(num.size(), r.num.size()) || buff != 0; ++i) {
+		if (i == num.size()) num.push_back(0);
+		num[i] += buff + (r.num.size() >= i ? r.num[i] : 0);
+		buff = num[i] >= base;
+		if (buff != 0)
+			num[i] -= base;
+	}
+
 	return *this;
+}
+
+big_int& big_int::operator -= (const big_int& r) {
+	if (r.minus) return *this += (-r);
+	else if (minus) {
+		big_int rr(r);
+		*this = -(rr -= *this);
+		return *this;
+	}
+	else if (*this < r) {
+		big_int rr(r);
+		*this = -(rr -= *this);
+		return *this;
+	}
+	short buff = 0;
+	for (auto i = 0; i < r.num.size() || buff != 0; ++i) {
+		num[i] -= buff + (i < r.num.size() ? r.num[i] : 0);
+		buff = num[i] < 0;
+		if (buff != 0)
+			num[i] += base;
+	}
+	this->remove_leading_zeros();
+	return *this;
+}
+
+const big_int operator + (const big_int& l, const big_int& r) {
+	big_int copy(l);
+	copy += r;
+	return copy;
+}
+
+
+const big_int operator - (const big_int& l, const big_int& r) {
+	big_int copy(l);
+	copy -= r;
+	return copy;
+}
+
+big_int& big_int::operator ++() {
+	return (*this += 1);
+}
+
+const big_int big_int::operator ++(int) {
+	big_int copy(*this);
+	*this += 1;
+	return copy;
+}
+
+big_int& big_int::operator --() {
+	return (*this -= 1);
+}
+
+const big_int big_int::operator --(int) {
+	big_int copy(*this);
+	*this -= 1;
+	return copy;
+}
+
+big_int& big_int::operator *= (const big_int& r) {
+	if (num.size() == 0) return *this;
+	if (r.num.size() == 0) {
+		*this = big_int();
+		return *this;
+	}
+
+	big_int res;
+	res.num.resize(num.size() + r.num.size());
+	for (auto i = 0; i < num.size(); ++i) {
+		int buff = 0;
+		for (auto j = 0; j < r.num.size() || buff != 0; ++j) {
+			long long cur = res.num[i + j] + num[i] * 1LL * (j < r.num.size() ? r.num[j] : 0) + buff;
+			res.num[i + j] = static_cast<int>(cur % base);
+			buff = static_cast<int>(cur / base);
+		}
+	}
+
+	res.minus = minus != r.minus;
+	res.remove_leading_zeros();
+	*this = res;
+	return *this;
+
+}
+
+const big_int operator * (const big_int& l, const big_int& r) {
+	big_int copy(l);
+	copy *= r;
+	return copy;
 }

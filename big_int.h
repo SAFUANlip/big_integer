@@ -6,6 +6,7 @@
 // https://e-maxx.ru/algo/big_integer
 // https://habr.com/ru/post/172285/?ysclid=l6ri45mh3v820500388
 // https://github.com/ThiBsc/BigInteger/blob/master/src/header/biginteger.h
+// https://e-maxx.ru/algo/binary_pow
 
 class big_int
 {
@@ -14,9 +15,10 @@ class big_int
 private:
 	std::vector<int> num;
 	bool minus = false;
-	static const int base = 1000000000; // 1 000 000 000, limitation for int
+	static const int BASE = 1000000000; // 1 000 000 000, limitation for int
 
 	void remove_leading_zeros();
+	void shift_right();
 	
 public:
 	// don't make explicit for operator == working not only with big_int, big_int 
@@ -43,6 +45,10 @@ public:
 	big_int& operator --();
 	const big_int operator --(int);
 	big_int& operator *= (const big_int&);
+	big_int& operator /= (const big_int&);
+	big_int& operator %= (const big_int&);
+
+	const big_int pow(big_int n) const;
 	/*auto operator <=>(const big_int& other, const big_int&) { // still dont know how to make it
 		return;
 	}*/
@@ -61,13 +67,12 @@ bool operator < (const T& l, const big_int& r) {
 }
 
 bool operator != (const big_int& l, const big_int& r);
-
 bool operator <= (const big_int& l, const big_int& r);
-
 bool operator > (const big_int& l, const big_int& r);
-
 bool operator >= (const big_int& l, const big_int& r);
 
 const big_int operator + (const big_int& l, const big_int& r);
 const big_int operator - (const big_int& l, const big_int& r);
 const big_int operator * (const big_int& l, const big_int& r);
+const big_int operator / (const big_int& l, const big_int& r);
+const big_int operator % (const big_int& l, const big_int& r);
